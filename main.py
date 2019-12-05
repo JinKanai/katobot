@@ -16,7 +16,7 @@ def lambda_handler(event, context):
         [
             {
                 "title": title,
-                "value": "家訓の説明（必要であれば）"
+                "value": None
             }
         ]
     )
