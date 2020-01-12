@@ -1,12 +1,12 @@
-from quotes_provider import QuoteProvider
 from tocaro_handler import TocaroHandler
+from quotes_provider_by_dynamodb import QuotesProviderByDynamoDb
 
 
 def lambda_handler(event, context):
-    harukas = QuoteProvider()
+    katos = QuotesProviderByDynamoDb()
 
     tocaro = TocaroHandler()
-    quote = harukas.get_quote()
+    quote = katos.get_quote()
 
     tocaro.set_text("【本日の加藤家家訓】 その{0}".format(str(quote["number"])))
     tocaro.set_color("danger")
