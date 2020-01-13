@@ -3,10 +3,23 @@ from quotes_provider_by_dynamodb import QuotesProviderByDynamoDb
 
 
 def lambda_handler(event, context):
-    katos = QuotesProviderByDynamoDb()
+    """
 
+    AWS lambdaから起動されるメイン関数
+
+    Args:
+        event (dict): 未使用
+        context (dict): 未使用
+
+    Returns:
+        dict: HTTP responce
+
+    """
+
+    kato = QuotesProviderByDynamoDb()
     tocaro = TocaroHandler()
-    quote = katos.get_quote()
+
+    quote = kato.get_quote()
 
     tocaro.set_text("【本日の加藤家家訓】 その{0}".format(str(quote["number"])))
     tocaro.set_color("danger")
@@ -26,4 +39,7 @@ def lambda_handler(event, context):
 
 
 if __name__ == '__main__':
+    """
+    テスト用main
+    """
     print(lambda_handler(None, None))

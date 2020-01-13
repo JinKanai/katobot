@@ -4,4 +4,5 @@ venv/
 KatoQuotes.txt
 packaged.yml
 .aws-sam/
+*.pyc
 
