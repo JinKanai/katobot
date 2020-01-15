@@ -38,8 +38,14 @@ def lambda_handler(event, context):
     return r
 
 
-if __name__ == '__main__':
-    """
-    テスト用main
-    """
+def main():
     print(lambda_handler(None, None))
+
+
+if __name__ == '__main__':
+    import sys
+
+    """
+    テスト用main関数
+    """
+    sys.exit(main())

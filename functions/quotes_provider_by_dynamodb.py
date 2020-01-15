@@ -8,11 +8,12 @@ class QuotesProviderByDynamoDb:
     """
     dynamoDBに格納されている格言を扱うクラス
     """
+
     def __init__(self):
         """
 
         コンストラクタ
-        dynamoDBのkatobotテーブルアブジェクトを取得
+        dynamoDBのkatobotテーブルオブジェクトを取得
 
         """
         self.TABLE_NAME = "katobot"
@@ -25,11 +26,10 @@ class QuotesProviderByDynamoDb:
         katobotの格言数を得るメソッド
 
         Returns:
-            dict: 格言の総数
+            int: 格言の総数
 
         """
         return self.table.item_count
-
 
     def get_quote(self):
         """
@@ -37,7 +37,7 @@ class QuotesProviderByDynamoDb:
         格言を得るメソッド
 
         Returns:
-            dict: 格言の番号と格言を持った辞書
+            dict: [int,str] 格言の番号と格言を持った辞書
 
         """
         id = random.choice(range(self._get_item_counts()))
@@ -46,7 +46,7 @@ class QuotesProviderByDynamoDb:
                 "id": id
             }
         )
-        # 開業が含まれているので削除する
+        # 改行が含まれているので削除する
         quote = q["Item"]["quote"].rstrip("\n")
         quote_dict = {
             "number": id,
@@ -56,9 +56,13 @@ class QuotesProviderByDynamoDb:
 
 
 def main():
+    """
+    テスト用関数
+    """
     p = QuotesProviderByDynamoDb()
     print(p.get_quote())
 
 
 if __name__ == '__main__':
-    main()
+    import sys
+    sys.exit(main())

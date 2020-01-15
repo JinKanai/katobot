@@ -56,7 +56,7 @@ Resources:
         NotifytoTocaro:
           Type: Schedule
           Properties:
-            Schedule: cron(50 23 ? * SUN-THU *)
+            Schedule: cron(55 23 ? * SUN-THU *)
 
   KatobotLogGroup:
     Type: AWS::Logs::LogGroup
