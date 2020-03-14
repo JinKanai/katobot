@@ -1,17 +1,22 @@
 import boto3
 import sys
+import csv
 
 TABLE_NAME = "katobot"
 
 
 def main():
     try:
-        with open("./KatoQuotes.txt", "r") as f:
-            quotes = f.readlines()
+        with open("./KatoQuotes.csv", "r") as f:
+            quotes = [t(i) for i in csv.reader(f)]
     except IOError as e:
         print("File I/O Error! Abort.")
         print(e)
         return 1
+
+    for i in quotes:
+        print(i)
+    return 0
 
     try:
         dynamo_db = boto3.resource("dynamodb")
@@ -24,14 +29,16 @@ def main():
                         "quote": quote
                     }
                 )
-                print("threw to {0} dynamoDB! id:{1} quote:{2}".format(TABLE_NAME, i, quote))
+                print("threw to {0} dynamoDB! id:{1} quote:{2}".format(TABLE_NAME, i, quote[0]))
     except Exception as e:
         print("some ERROR was detected. Abort.")
         print(e)
         return 1
 
+    f.close()
     return 0
 
 
 if __name__ == '__main__':
     sys.exit(main())
+
