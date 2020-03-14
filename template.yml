@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: "katobot the golden quotes by Kato-bucho"
+
+Globals:
+  Function:
+    Timeout: 180
+
+Parameters:
+  TocaroUrl:
+    Type: String
+    Default: "paste tocaro webhook URL"
+
+Resources:
+  KatobotIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: "KatobotLambdaPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                  - "ce:GetCostAndUsage"
+                  - "dynamodb:BatchGetItem"
+                  - "dynamodb:Describe*"
+                  - "dynamodb:List*"
+                  - "dynamodb:GetItem"
+                  - "dynamodb:Query"
+                  - "dynamodb:Scan"
+                Resource: "*"
+
+  KatobotFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/
+      Handler: main.lambda_handler
+      Runtime: python3.6
+      Role: !GetAtt KatobotIamRole.Arn
+      Environment:
+        Variables:
+          TOCARO_URL: !Ref TocaroUrl
+          TZ: Asia/Tokyo
+      Events:
+        NotifytoTocaro:
+          Type: Schedule
+          Properties:
+            Schedule: cron(55 23 ? * SUN-THU *)
+
+  KatobotLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${KatobotFunction}
+      RetentionInDays: 14
+
+Outputs:
+  KatobotFunction:
+    Description: "Katobot"
+    Value: !GetAtt KatobotFunction.Arn
+  KatobotIamRole:
+    Description: "Implicit IAM Role created for Katobot"
+    Value: !GetAtt KatobotIamRole.Arn
