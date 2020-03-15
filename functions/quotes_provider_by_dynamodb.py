@@ -16,20 +16,22 @@ class QuotesProviderByDynamoDb:
         dynamoDBのkatobotテーブルオブジェクトを取得
 
         """
-        self.TABLE_NAME = "katobot"
+        self.TABLE_NAME = "katobot-remaining"
         self.resource = boto3.resource("dynamodb")
         self.table = self.resource.Table(self.TABLE_NAME)
+        self.item_count = self.table.item_count
+        self.all_quotes = self.table.scan()
 
-    def _get_item_counts(self):
-        """
+    def _get_not_said_quote(self):
+        quotes = self._get_all_of_not_said_quotes()
+        if not quotes:
+            self._flush_is_said()
+            quotes = self._get_all_of_not_said_quotes()
+        quote = random.choice(quotes)
+        return quote
 
-        katobotの格言数を得るメソッド
-
-        Returns:
-            int: 格言の総数
-
-        """
-        return self.table.item_count
+    def _get_all_of_not_said_quotes(self):
+        return [quote for quote in self.all_quotes["Items"] if not quote["isSaid"]]
 
     def get_quote(self):
         """
@@ -40,28 +42,36 @@ class QuotesProviderByDynamoDb:
             dict: [int,str] 格言の番号と格言を持った辞書
 
         """
-        id = random.choice(range(self._get_item_counts()))
-        q = self.table.get_item(
-            Key={
-                "id": id
-            }
-        )
         # 改行が含まれているので削除する
-        quote = q["Item"]["quote"].rstrip("\n")
+        quote = self._get_not_said_quote()
+        content = quote["quote"].rstrip("\n")
         quote_dict = {
-            "number": id,
-            "content": quote
+            "number": quote["id"],
+            "content": content
         }
+
+        quote["isSaid"] = 1
+        self.table.put_item(
+                Item=quote
+        )
         return quote_dict
 
+    def _flush_is_said(self):
+        for quote in self.all_quotes["Items"]:
+            quote["isSaid"] = 0
+            self.table.put_item(
+                    Item=quote
+                    )
+        return
 
 def main():
     """
     テスト用関数
     """
     p = QuotesProviderByDynamoDb()
-    print(p.get_quote())
-
+    quote = p.get_quote()
+    print(quote)
+    print(p.item_count)
 
 if __name__ == '__main__':
     import sys
