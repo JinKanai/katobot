@@ -2,6 +2,7 @@
 
 import boto3
 import random
+import os
 
 
 class QuotesProviderByDynamoDb:
@@ -16,7 +17,7 @@ class QuotesProviderByDynamoDb:
         dynamoDBのkatobotテーブルオブジェクトを取得
 
         """
-        self.TABLE_NAME = "katobot-remaining"
+        self.TABLE_NAME = os.environ["DYNAMODB_TABLE"]
         self.resource = boto3.resource("dynamodb")
         self.table = self.resource.Table(self.TABLE_NAME)
         self.item_count = self.table.item_count
@@ -50,7 +51,7 @@ class QuotesProviderByDynamoDb:
             "content": content
         }
 
-        quote["isSaid"] = 1
+        quote["isSaid"] = True
         self.table.put_item(
                 Item=quote
         )
@@ -58,11 +59,12 @@ class QuotesProviderByDynamoDb:
 
     def _flush_is_said(self):
         for quote in self.all_quotes["Items"]:
-            quote["isSaid"] = 0
+            quote["isSaid"] = False
             self.table.put_item(
                     Item=quote
                     )
         return
+
 
 def main():
     """
@@ -72,6 +74,7 @@ def main():
     quote = p.get_quote()
     print(quote)
     print(p.item_count)
+
 
 if __name__ == '__main__':
     import sys

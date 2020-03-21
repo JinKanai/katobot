@@ -1,18 +1,22 @@
 import boto3
 import sys
 import csv
+import os
 
-TABLE_NAME = "katobot-remaining"
+# QUOTES_FILE = "./KatoQuotes.csv"
+QUOTES_FILE = "./tests/KatoQuote.99.csv"
 
 
 def main():
     try:
-        with open("./KatoQuotes.csv", "r") as f:
+        with open(QUOTES_FILE, "r") as f:
             quotes = [i for i in csv.reader(f)]
     except IOError as e:
         print("File I/O Error! Abort.")
         print(e)
         return 1
+
+    TABLE_NAME = os.environ["DYNAMODB_TABLE"]
 
     try:
         dynamo_db = boto3.resource("dynamodb")
