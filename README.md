@@ -3,23 +3,23 @@
 
 ## ディレクトリ構成
 ```$xslt
-├── KatoQuotes.csv 名言のもと。発言済みか否かの0/1フラグ付き。1が発言済み
-├── README.md 本ファイル
-├── functions Lmabda関数の本体とそこから利用されるモジュール
-│   ├── functions.iml IntelliJIdeaのモジュール定義（なくてもいいファイル）
-│   ├── http_client.py HTTPアクセス用のモジュール
-│   ├── main.py Lambda関数の本体
-│   ├── quotes_provider_by_dynamodb.py DynamoDBを取り扱うモジュール
-│   ├── requirements.txt Lamndaへのデプロイ時に必要なモジュールたち（今は空）
-│   └── tocaro_handler.py tocaroのメッセージを組み立てるモジュール
-├── requirements.txt 本アプリで必要になるモジュール
-├── template.yml SAMの定義ファイル
-├── throw2dynamodb.py KatobotQuotes.csvをDynamoDBに入れるためのツール
+├── KatoQuotes.csv ... 名言のもと。発言済みか否かの0/1フラグ付き。1が発言済み
+├── README.md ... 本ファイル
+├── functions ... Lmabda関数の本体とそこから利用されるモジュール
+│   ├── functions.iml ... IntelliJIdeaのモジュール定義（なくてもいいファイル）
+│   ├── http_client.py ... HTTPアクセス用のモジュール
+│   ├── main.py ... Lambda関数の本体
+│   ├── quotes_provider_by_dynamodb.py ... DynamoDBを取り扱うモジュール
+│   ├── requirements.txt ... Lamndaへのデプロイ時に必要なモジュールたち（今は空）
+│   └── tocaro_handler.py ... tocaroのメッセージを組み立てるモジュール
+├── requirements.txt ... 本アプリで必要になるモジュール
+├── template.yml ... SAMの定義ファイル
+├── throw2dynamodb.py ... KatobotQuotes.csvをDynamoDBに入れるためのツール
 ```
 
 ## 事前準備
 1. DynamoDB/Lambda/Cloudwatch eventへのアクセス権を持ったAWSアクセスキーを用意（もしくはロールを設定したインスタンスにクローン）
-1. Python仮想環境を作成のち中にはいって`pip install -r requirements.txt`を実行
+1. Python仮想環境を作成して中に入ってから`pip install -r requirements.txt`を実行
 1. DynamoDBに適当な名前でテーブルを作成
 1. 上で作ったテーブル名を環境変数`DYNAMODB_TABLE`に記載
 1. throw2dynamodb.pyを実行して、DynamoDBのテーブルに名言が入っていることを確認
@@ -35,7 +35,7 @@
 ## デプロイ
 - SAM CLIを使ってデプロイする場合は以下を参考にしてください。
 ```$xslt
-$ sam build
+sam build
 ```
 ```$xslt
 sam package --s3-bucket sam-cli-test.tdaws.ctcs --output-template-file packaged.yml
