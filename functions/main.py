@@ -1,4 +1,4 @@
-from tocaro_handler import TocaroHandler
+from postkun.slack import SlackHandler
 from quotes_provider_by_dynamodb import QuotesProviderByDynamoDb
 
 
@@ -17,15 +17,15 @@ def lambda_handler(event, context):
     """
 
     kato = QuotesProviderByDynamoDb()
-    tocaro = TocaroHandler()
+    messenger = SlackHandler()
 
     quote = kato.get_quote()
 
-    tocaro.set_text("【本日の加藤家家訓】 その{0}".format(str(quote["number"])))
-    tocaro.set_color("danger")
+    messenger.set_pre_text("【本日の加藤家家訓】 その{0}".format(str(quote["number"])))
+    messenger.set_color("#ff0000")
 
     title = quote["content"]
-    tocaro.set_attachments(
+    messenger.set_attachments(
         [
             {
                 "title": title,
@@ -34,7 +34,7 @@ def lambda_handler(event, context):
         ]
     )
 
-    r = tocaro.send2tocaro()
+    r = messenger.post_message()
     return r
 
 

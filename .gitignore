@@ -5,4 +5,8 @@ packaged.yml
 .aws-sam/
 *.pyc
 .envrc
+KatoQuotes*.csv
+postkun/
+
+
 

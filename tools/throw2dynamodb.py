@@ -3,8 +3,7 @@ import sys
 import csv
 import os
 
-# QUOTES_FILE = "./KatoQuotes.csv"
-QUOTES_FILE = "./tests/KatoQuote.99.csv"
+QUOTES_FILE = "./KatoQuote.csv"
 
 
 def main():
@@ -16,7 +15,12 @@ def main():
         print(e)
         return 1
 
-    TABLE_NAME = os.environ["DYNAMODB_TABLE"]
+    try:
+        TABLE_NAME = os.environ["DYNAMODB_TABLE"]
+    except KeyError as e:
+        print("dynamodb table is not defined.")
+        print("table name is {}".format(e))
+        return 1
 
     try:
         dynamo_db = boto3.resource("dynamodb")
@@ -26,7 +30,7 @@ def main():
                 batch.put_item(
                     Item={
                         "id": i + 1,
-                        "isSaid": int(quote[1]),
+                        "isSaid": False,
                         "quote": quote[0]
                     }
                 )
