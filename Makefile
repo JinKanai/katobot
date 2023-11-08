@@ -4,6 +4,6 @@ deploy:
 	sam deploy --template-file ./packaged.yml --stack-name cfn-katobot --region ap-northeast-1 --capabilities CAPABILITY_IAM
 
 postkun:
-	pip install git+https://github.com/jinkanai/postkun.git@feature/init -t functions -U
+	pip install git+https://github.com/jinkanai/postkun.git -t functions -U
 	rm -rf functions/postkun-*
 

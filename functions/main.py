@@ -1,5 +1,6 @@
 from postkun.slack import SlackHandler
 from quotes_provider_by_dynamodb import QuotesProviderByDynamoDb
+from quotes_provider_dummy import QuotesProviderDummy
 
 
 def lambda_handler(event, context):
@@ -16,11 +17,11 @@ def lambda_handler(event, context):
 
     """
 
-    kato = QuotesProviderByDynamoDb()
-    messenger = SlackHandler()
-
+    # kato = QuotesProviderByDynamoDb()
+    kato = QuotesProviderDummy() 
     quote = kato.get_quote()
 
+    messenger = SlackHandler()
     messenger.set_pre_text("【本日の加藤家家訓】 その{0}".format(str(quote["number"])))
     messenger.set_color("#ff0000")
 
