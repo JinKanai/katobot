@@ -7,9 +7,13 @@ Globals:
     Timeout: 180
 
 Parameters:
-  TocaroUrl:
+  MessengerUrl:
     Type: String
-    Default: "paste tocaro webhook URL"
+    Default: "input messenger webhook URL"
+  DynamoDbTable:
+    Type: String
+    Default: "input DynamoDB table name"
+
 
 Resources:
   KatobotIamRole:
@@ -48,14 +52,17 @@ Resources:
     Properties:
       CodeUri: functions/
       Handler: main.lambda_handler
-      Runtime: python3.7
+      Runtime: python3.11
+      Layers:
+        - arn:aws:lambda:ap-northeast-1:531950576581:layer:postkun:2
       Role: !GetAtt KatobotIamRole.Arn
       Environment:
         Variables:
-          TOCARO_URL: !Ref TocaroUrl
+          MESSENGER_URL: !Ref MessengerUrl
           TZ: Asia/Tokyo
+          DYNAMODB_TABLE: !Ref DynamoDbTable
       Events:
-        NotifytoTocaro:
+        NotifytoMessenger:
           Type: Schedule
           Properties:
             Schedule: cron(55 23 ? * SUN-THU *)

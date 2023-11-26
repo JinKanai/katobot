@@ -18,7 +18,7 @@ def lambda_handler(event, context):
     """
 
     # kato = QuotesProviderByDynamoDb()
-    kato = QuotesProviderDummy() 
+    kato = QuotesProviderByDynamoDb()
     quote = kato.get_quote()
 
     messenger = SlackHandler()

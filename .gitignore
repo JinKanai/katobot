@@ -7,3 +7,4 @@ packaged.yml
 .envrc
 KatoQuotes*.csv
 postkun/
+samconfig.toml
