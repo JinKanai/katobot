@@ -1,6 +1,8 @@
-from postkun.slack import SlackHandler
+import json
+import requests
+import os
+
 from quotes_provider_by_dynamodb import QuotesProviderByDynamoDb
-from quotes_provider_dummy import QuotesProviderDummy
 
 
 def lambda_handler(event, context):
@@ -21,22 +23,22 @@ def lambda_handler(event, context):
     kato = QuotesProviderByDynamoDb()
     quote = kato.get_quote()
 
-    messenger = SlackHandler()
-    messenger.set_pre_text("【本日の加藤家家訓】 その{0}".format(str(quote["number"])))
-    messenger.set_color("#ff0000")
-
-    title = quote["content"]
-    messenger.set_attachments(
-        [
+    message = {
+        "text": None,
+        "attachments": [
             {
-                "title": title,
-                "value": None
+                "hoge": None
             }
         ]
-    )
+    }
 
-    r = messenger.post_message()
-    return r
+    message["text"]="【本日の加藤家家訓】 その{0}".format(str(quote["number"]))
+    message["color"]="#ff0000"
+    message["attachments"][0]["title"] = quote["content"]
+
+    url = os.environ["MESSENGER_URL"]
+    r = requests.post(url, data=json.dumps(message))
+    # return r
 
 
 def main():
