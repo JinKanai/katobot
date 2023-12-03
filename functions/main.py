@@ -1,4 +1,7 @@
-from tocaro_handler import TocaroHandler
+import json
+import requests
+import os
+
 from quotes_provider_by_dynamodb import QuotesProviderByDynamoDb
 
 
@@ -16,26 +19,26 @@ def lambda_handler(event, context):
 
     """
 
+    # kato = QuotesProviderByDynamoDb()
     kato = QuotesProviderByDynamoDb()
-    tocaro = TocaroHandler()
-
     quote = kato.get_quote()
 
-    tocaro.set_text("【本日の加藤家家訓】 その{0}".format(str(quote["number"])))
-    tocaro.set_color("danger")
-
-    title = quote["content"]
-    tocaro.set_attachments(
-        [
+    message = {
+        "text": None,
+        "attachments": [
             {
-                "title": title,
-                "value": None
+                "hoge": None
             }
         ]
-    )
+    }
 
-    r = tocaro.send2tocaro()
-    return r
+    message["text"]="【本日の加藤家家訓】 その{0}".format(str(quote["number"]))
+    message["color"]="#ff0000"
+    message["attachments"][0]["title"] = quote["content"]
+
+    url = os.environ["MESSENGER_URL"]
+    r = requests.post(url, data=json.dumps(message))
+    # return r
 
 
 def main():
