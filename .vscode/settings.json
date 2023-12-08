@@ -1,0 +1,9 @@
+{
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "files.autoSave": "onFocusChange",
+    "editor.fontSize": 14,
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+      }
+}

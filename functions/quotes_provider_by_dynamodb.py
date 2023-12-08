@@ -1,81 +1,56 @@
 # -*- coding: utf-8 -*-
 
 import boto3
+from boto3.dynamodb.conditions import Key
 import random
 import os
+from datetime import datetime, timedelta
 
 
 class QuotesProviderByDynamoDb:
-    """
-    dynamoDBに格納されている格言を扱うクラス
-    """
-
     def __init__(self):
-        """
-
-        コンストラクタ
-        dynamoDBのkatobotテーブルオブジェクトを取得
-
-        """
+        # self.TABLE_NAME = "GoldenQuotes"
         self.TABLE_NAME = os.environ["DYNAMODB_TABLE"]
         self.resource = boto3.resource("dynamodb")
+        # self.resource = boto3.resource(
+        #    "dynamodb", endpoint_url="http://192.168.0.11:8000"
+        # )
         self.table = self.resource.Table(self.TABLE_NAME)
         self.item_count = self.table.item_count
-        self.all_quotes = self.table.scan()
-
-    def _get_not_said_quote(self):
-        quotes = self._get_all_of_not_said_quotes()
-        if not quotes:
-            self._flush_is_said()
-            quotes = self._get_all_of_not_said_quotes()
-        quote = random.choice(quotes)
-        return quote
-
-    def _get_all_of_not_said_quotes(self):
-        return [quote for quote in self.all_quotes["Items"] if not quote["isSaid"]]
 
     def get_quote(self):
-        """
-
-        格言を得るメソッド
-
-        Returns:
-            dict: [int,str] 格言の番号と格言を持った辞書
-
-        """
-        # 改行が含まれているので削除する
-        quote = self._get_not_said_quote()
-        content = quote["quote"].rstrip("\n")
-        quote_dict = {
-            "number": quote["id"],
-            "content": content
-        }
-
-        quote["isSaid"] = True
-        self.table.put_item(
-                Item=quote
+        today = datetime.today()
+        # target は今日より三ヶ月前のUNIXTIME
+        target = int(
+            datetime.timestamp(datetime(today.year, today.month - 3, today.day))
         )
+
+        # 三ヶ月以上前に発言した格言からランダムで一個取り出す
+        quotes = self.table.query(
+            IndexName="said_index",
+            KeyConditionExpression=Key("author").eq("kato-bucho")
+            & Key("said_at").lt(target),
+        )
+        quote_dict = random.choice(quotes["Items"])
+
+        # 発言した格言のsaid_atを今日のタイムスタンプに変更
+        option = {
+            "Key": {"author": "kato-bucho", "id": quote_dict["id"]},
+            "UpdateExpression": "set #said_at = :said_at",
+            "ExpressionAttributeNames": {"#said_at": "said_at"},
+            "ExpressionAttributeValues": {":said_at": int(datetime.timestamp(today))},
+        }
+        res = self.table.update_item(**option)
+
         return quote_dict
 
-    def _flush_is_said(self):
-        for quote in self.all_quotes["Items"]:
-            quote["isSaid"] = False
-            self.table.put_item(
-                    Item=quote
-                    )
-        return
+
+def test_func():
+    d = QuotesProviderByDynamoDb()
+    print(d.get_quote())
 
 
-def main():
-    """
-    テスト用関数
-    """
-    p = QuotesProviderByDynamoDb()
-    quote = p.get_quote()
-    print(quote)
-    print(p.item_count)
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
-    sys.exit(main())
+
+    sys.exit(test_func())
