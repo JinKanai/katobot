@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import boto3
-from boto3.dynamodb.conditions import Key
 import random
 import os
-from datetime import datetime, timedelta
+
+from datetime import datetime
+from boto3.dynamodb.conditions import Key
 
 
 class QuotesProviderByDynamoDb:

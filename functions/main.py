@@ -3,6 +3,10 @@ import requests
 import os
 
 from quotes_provider_by_dynamodb import QuotesProviderByDynamoDb
+from aws_xray_sdk.core import xray_recorder
+from aws_xray_sdk.core import patch_all
+
+patch_all()
 
 
 def lambda_handler(event, context):

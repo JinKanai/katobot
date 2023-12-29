@@ -5,6 +5,8 @@ Description: "katobot the golden quotes by Kato-bucho"
 Globals:
   Function:
     Timeout: 180
+    Tracing: Active
+
 
 Parameters:
   MessengerUrl:
@@ -39,6 +41,8 @@ Resources:
                   - "dynamodb:DescribeTable"
                   - "dynamodb:Query"
                   - "dynamodb:UpdateItem"
+                  - "xray:PutTraceSegments"
+                  - "xray:PutTelemetryRecords"
                 Resource: "*"
 
   KatobotFunction:
@@ -49,6 +53,7 @@ Resources:
       Runtime: python3.12
       Layers:
         - arn:aws:lambda:us-west-2:770693421928:layer:Klayers-p310-requests:7
+        - arn:aws:lambda:us-west-2:770693421928:layer:Klayers-p311-aws-xray-sdk:5
       Role: !GetAtt KatobotIamRole.Arn
       Environment:
         Variables:
