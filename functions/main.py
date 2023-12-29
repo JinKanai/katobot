@@ -3,52 +3,33 @@ import requests
 import os
 
 from quotes_provider_by_dynamodb import QuotesProviderByDynamoDb
+from aws_xray_sdk.core import xray_recorder
+from aws_xray_sdk.core import patch_all
+
+patch_all()
 
 
 def lambda_handler(event, context):
-    """
-
-    AWS lambdaから起動されるメイン関数
-
-    Args:
-        event (dict): 未使用
-        context (dict): 未使用
-
-    Returns:
-        dict: HTTP responce
-
-    """
-
-    # kato = QuotesProviderByDynamoDb()
     kato = QuotesProviderByDynamoDb()
     quote = kato.get_quote()
+    print(quote)
 
     message = {
-        "text": None,
-        "attachments": [
-            {
-                "hoge": None
-            }
-        ]
+        "username": "katbot the GOLDEN QUOTES from kato-bucho",
+        "text": "【本日の加藤家家訓】 その{0}".format(str(quote["id"])),
+        "color": "#ff0000",
+        "attachments": [{"title": quote["quote"]}],
     }
-
-    message["text"]="【本日の加藤家家訓】 その{0}".format(str(quote["number"]))
-    message["color"]="#ff0000"
-    message["attachments"][0]["title"] = quote["content"]
-
     url = os.environ["MESSENGER_URL"]
     r = requests.post(url, data=json.dumps(message))
     # return r
 
 
-def main():
+def test_func():
     print(lambda_handler(None, None))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
 
-    """
-    テスト用main関数
-    """
-    sys.exit(main())
+    sys.exit(test_func())

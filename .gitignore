@@ -9,3 +9,5 @@ KatoQuotes*.csv
 postkun/
 samconfig.toml
 account.txt
+.DS_Store
+out.txt
