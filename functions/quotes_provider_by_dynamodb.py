@@ -4,7 +4,7 @@ import boto3
 import random
 import os
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from boto3.dynamodb.conditions import Key
 
 
@@ -21,12 +21,10 @@ class QuotesProviderByDynamoDb:
 
     def get_quote(self):
         today = datetime.today()
-        # target は今日より三ヶ月前のUNIXTIME
-        target = int(
-            datetime.timestamp(datetime(today.year, today.month - 3, today.day))
-        )
+        # target は今日より90日前のUNIXTIME
+        target = int(datetime.timestamp(today - timedelta(days=90)))
 
-        # 三ヶ月以上前に発言した格言からランダムで一個取り出す
+        # 90日以上前に発言した格言からランダムで一個取り出す
         quotes = self.table.query(
             IndexName="said_index",
             KeyConditionExpression=Key("author").eq("kato-bucho")
